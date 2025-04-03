@@ -18,7 +18,7 @@ namespace EntityModels.Models
         public string Name { get; set; }
 
         [Required]
-        public string CountruyCode { get; set; }
+        public string CountryCode { get; set; }
 
         [Required]
         public string Phone { get; set; }
@@ -30,9 +30,9 @@ namespace EntityModels.Models
         [MaxLength(100, ErrorMessage = "Email cannot exceed 100 characters")]
         public string Email { get; set; }
 
-        public Guid UserId { get; set; }
+        public Guid InsertedUser { get; set; }
 
-        [ForeignKey("UserId")]
+        [ForeignKey("InsertedUser")]
         public User User { get; set; }
         public ICollection<EditLock> EditLocks { get; set; } = new List<EditLock>();
 

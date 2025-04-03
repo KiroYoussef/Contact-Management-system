@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EntityModels.Models
 {
-    public class Countruy
+    public class Country
     {
         [Key]
         public string Code { get; set; }
