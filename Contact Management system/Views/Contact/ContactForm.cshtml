@@ -1,29 +1,34 @@
-﻿@using EntityModels.Models
-@model Contact
+﻿@using EntityModels.DTO
+@model ContactDTO
 
 <div class="modal fade" id="contactModal" tabindex="-1" aria-labelledby="contactModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="contactModalLabel">Contact Information</h5>
+                <h5 class="modal-title" id="contactModalLabel">
+                    <span id="modalTitle">Add Contact</span>
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="contactForm" asp-action="AddContact" asp-controller="Contact" method="post">
+                <form id="contactForm" method="post">
+                    @* Hidden field for Contact ID *@
+                    <input type="hidden" asp-for="Id" id="contactId" />
+
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label">Name</label>
-                        <input asp-for="Name" class="form-control" required />
+                        <input asp-for="Name" class="form-control" id="contactName" required />
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Email" class="form-label">Email Address</label>
-                        <input asp-for="Email" type="email" class="form-control" required />
+                        <input asp-for="Email" type="email" class="form-control" id="contactEmail" required />
                     </div>
 
                     <div class="row">
                         <div class="col-md-6">
                             <label asp-for="CountryCode" class="form-label">Country Code</label>
-                            <select asp-for="CountryCode" class="form-select">
+                            <select asp-for="CountryCode" class="form-select" id="contactCountryCode">
                                 <option value="+20">Egypt +20</option>
                                 <option value="+1">USA +1</option>
                                 <option value="+44">UK +44</option>
@@ -31,24 +36,24 @@
                         </div>
                         <div class="col-md-6">
                             <label asp-for="Phone" class="form-label">Phone Number</label>
-                            <input asp-for="Phone" type="tel" class="form-control" required />
+                            <input asp-for="Phone" type="tel" class="form-control" id="contactPhone" required />
                         </div>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Address" class="form-label">Address</label>
-                        <input asp-for="Address" class="form-control" />
+                        <input asp-for="Address" class="form-control" id="contactAddress" />
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Notes" class="form-label">Notes</label>
-                        <textarea asp-for="Notes" class="form-control"></textarea>
+                        <textarea asp-for="Notes" class="form-control" id="contactNotes"></textarea>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" class="btn btn-primary">Save Contact</button>
                     </div>
+
                 </form>
             </div>
         </div>

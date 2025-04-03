@@ -17,12 +17,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
     });
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(
+        builder.Configuration.GetValue<int>("SessionTimeoutHour")
+    ); 
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IContactService, ContactService>();
 
 
 
@@ -40,6 +49,7 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseSession();
 
 app.UseAuthorization();
 

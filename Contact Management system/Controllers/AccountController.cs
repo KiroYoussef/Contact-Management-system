@@ -30,12 +30,19 @@ namespace Contact_Management_system.Controllers
 
         {
           var Result= _UserService.Login(user);
-            if (Result.Result)
+            if (!string.IsNullOrEmpty( Result.Result.Username))
             {
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Username)
                 };
+
+                // set user Data in session 
+                HttpContext.Session.SetString("UserId", Result.Result.Id.ToString()); 
+                HttpContext.Session.SetString("FirstNameUser", Result.Result.FirstName); 
+                HttpContext.Session.SetString("MiddleNameUser", Result.Result.MiddleName); 
+                HttpContext.Session.SetString("LastNameUser", Result.Result.LastName);
+
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var authProperties = new AuthenticationProperties

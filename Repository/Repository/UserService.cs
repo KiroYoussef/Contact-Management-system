@@ -75,14 +75,24 @@ namespace Repository.Repository
             return true;
         }
 
-        public async Task<bool> Login(LoginDTO UserInfo)
+        public async Task<UserDTO> Login(LoginDTO UserInfo)
         {
             var user =await  _context.Users.FirstOrDefaultAsync(u => u.Username == UserInfo.Username);
-            if (user == null) return false;
+            if (user == null) return new UserDTO(){ };
 
+            if (user.VerifyPassword(UserInfo.Password, _secretKey))
+            {
+                UserDTO CurrentUser=new UserDTO();
+                CurrentUser.Id = user.Id;       
+                CurrentUser.Username = user.Username;
+                CurrentUser.FirstName = user.FirstName;
+                CurrentUser.MiddleName = user.MiddleName;
+                CurrentUser.LastName = user.LastName;
+                return CurrentUser;
 
-
-            return user.VerifyPassword(UserInfo.Password, _secretKey);
+            }
+            else
+                return new UserDTO() { };
         }
     }
 }

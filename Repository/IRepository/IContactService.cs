@@ -8,12 +8,8 @@ using System.Threading.Tasks;
 
 namespace Repository.IRepository
 {
-    public interface IUserService
+    public interface IContactService
     {
-        void AddDefaultUsers();
-
-        Task<bool> Register(RegisterDTO UserInfo);
-        Task<UserDTO> Login(LoginDTO UserInfo); 
-           
+        List<Contact> GetContacts();
     }
 }

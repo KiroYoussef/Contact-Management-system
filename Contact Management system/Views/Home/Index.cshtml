@@ -1,9 +1,159 @@
 ﻿@{
+   // @using EntityModels.Models
+
     ViewData["Title"] = "Home Page";
+    List<Contact> Contacts = ViewBag.Contacts;
+    var firstName = Context.Session.GetString("FirstNameUser") ?? "";
+    var middleName = Context.Session.GetString("MiddleNameUser") ?? "";
+    var lastName = Context.Session.GetString("LastNameUser") ?? "";
+    var UserName = $"{firstName} {middleName} {lastName}";
 }
 
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">MyApp</a>
+
+        <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+                @if (Context.Session.GetString("FirstNameUser") != null)
+                {
+                    <li class="nav-item">
+                        <span class="nav-link">👤 @(UserName)</span>
+                    </li>
+                    <li class="nav-item">
+                        <form asp-controller="Account" asp-action="Logout" method="post">
+                            <button type="submit" class="btn btn-danger">Logout</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Notes</th>
+            <th>Inserted User</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="contactTableBody">
+        @foreach (Contact contact in Contacts)
+        {
+            <tr data-id="@contact.Id">
+                <td>@contact.Name</td>
+                <td>@contact.Email</td>
+                <td>@contact.CountryCode @contact.Phone</td>
+                <td>@contact.Notes</td>
+                <td>@contact.User.Username</td>
+
+                <td>
+                    <button type="button" class="btn btn-warning btn-sm edit-btn" onclick="OpenEditContact(@contact.Id)">
+                        Edit
+                    </button>
+
+
+                    <button type="button" class="btn btn-danger" onclick="SetContactID(@contact.Id)" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@contact.Id">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button type="button" class="btn btn-primary" onclick="OpenAddContact()">
     Add Contact
 </button>
 
-<partial name="ContactForm" />
+
+@* Models *@
+<partial name="~/Views/Contact/ContactForm.cshtml" />
+<partial name="~/Views/Contact/DeleteConfirmationForm.cshtml" />
+
+
+
+
+
+<script>
+      var ContactID = "";
+
+    $(document).ready(function () {
+        var successMessage = @Html.Raw(Json.Serialize(TempData["SuccessMessage"]));
+        var errorMessage = @Html.Raw(Json.Serialize(TempData["ErrorMessage"]));
+
+        if (successMessage && successMessage !== "null") {
+            toastr.success(successMessage);
+        }
+        if (errorMessage && errorMessage !== "null") {
+            toastr.error(errorMessage);
+        }
+    });
+
+    // Set Contact ID for deletion
+    function SetContactID(id) {
+        ContactID = id;
+    }
+
+    // Delete Contact using AJAX
+    function DeleteContact() {
+        $.ajax({
+            url: `/Contact/DeleteContact?ContactID=${ContactID}`,
+            type: 'DELETE',
+            success: function (response) {
+                location.reload(); // Reload the page after deletion
+            },
+            error: function () {
+                toastr.error("Failed to delete contact.");
+            }
+        });
+    }
+
+    // Load Contact Data for Editing
+    function OpenEditContact(id) {
+        $.ajax({
+            url: `/Contact/GetContact/${id}`,
+            type: 'GET',
+            success: function (contact) {
+                // Set form values
+                $("#contactId").val(contact.id);
+                $("#contactName").val(contact.name);
+                $("#contactEmail").val(contact.email);
+                $("#contactCountryCode").val(contact.countryCode);
+                $("#contactPhone").val(contact.phone);
+                $("#contactAddress").val(contact.address);
+                $("#contactNotes").val(contact.notes);
+
+                // Change modal title & form action
+                $("#modalTitle").text("Edit Contact");
+                $("#contactForm").attr("action", "/Contact/EditContact");
+
+                // Open modal
+                $("#contactModal").modal("show");
+            },
+            error: function () {
+                toastr.error("Failed to load contact.");
+            }
+        });
+    }
+
+    // Reset Modal when Adding a New Contact
+    function OpenAddContact() {
+        $("#contactForm")[0].reset();
+        $("#contactId").val(""); // Reset ID
+        $("#modalTitle").text("Add Contact");
+        $("#contactForm").attr("action", "/Contact/AddContact");
+        $("#contactModal").modal("show");
+    }
+
+</script>
