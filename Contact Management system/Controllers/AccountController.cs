@@ -7,6 +7,7 @@ using System.Security.Claims;
 
 namespace Contact_Management_system.Controllers
 {
+
     public class AccountController : Controller
     {
 
@@ -20,12 +21,14 @@ namespace Contact_Management_system.Controllers
 
         }
         [HttpGet]
+
         public IActionResult login()
         {
             return View("login");
 
         }
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> login(LoginDTO user)
 
         {

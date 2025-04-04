@@ -14,6 +14,7 @@
                 <form id="contactForm" method="post">
 
                     <input type="hidden" asp-for="Id" id="contactId" />
+                    @Html.AntiForgeryToken()
 
                     <div class="mb-3">
                         <label asp-for="Name" class="form-label">Name</label>

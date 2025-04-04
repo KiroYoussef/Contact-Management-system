@@ -12,28 +12,24 @@ namespace Contact_Management_system.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    protected readonly AppDbContext _context;
     private readonly string _secretKey;
     private readonly  IContactService _ContactService;
 
-    public HomeController(ILogger<HomeController> logger , AppDbContext context, IConfiguration configuration, IContactService contactService)
+    public HomeController(ILogger<HomeController> logger , IConfiguration configuration, IContactService contactService)
     {
         _logger = logger;
-        _context = context;
         _secretKey = configuration["SecretKey"];
         _ContactService = contactService;
     }
+
     public IActionResult Index()
     {
-       var Result = _ContactService.GetContacts();
+       var Result = _ContactService.GetContacts(null, null  , null,1,5);
    
         ViewBag.Contacts = Result;
 
        return View();
     }
-
- 
-
 
     public IActionResult Privacy()
     {

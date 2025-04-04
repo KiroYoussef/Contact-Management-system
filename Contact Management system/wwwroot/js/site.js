@@ -7,22 +7,24 @@
             if (button.length) {
                 button.prop("disabled", true); 
             } else {
-                console.warn("Button with ID " + EditContactID + " not found.");
+                console.warn("BTN with id " + EditContactID + " not found");
             }
         });
 
         connection.on("UnlockReceived", function (Contact) {
             var button = $("#" + Contact);
             if (button.length) {
-                button.prop("disabled", false);  // Enables the Edit button
+                button.prop("disabled", false); 
             } else {
-                console.warn("Button with ID " + Contact + " not found.");
+                console.warn("BTN with id " + Contact + " not found");
+
             }
         });
 
     }).catch(function (err) {
-        console.error("SignalR connection error: " + err.toString());
+        console.error(" error: " + err.toString());
     });
+;
 
     $("#contactForm").submit(function (event) {
         event.preventDefault();
@@ -39,8 +41,8 @@
             type: $("#contactForm").attr("method"),
             data: $(this).serialize(),
             success: function (response) {
-                updateContactTable(response)
-
+                updateContactTable(response.contacts)
+                renderPagination(response.totalCount, 5, 1);
                 $("#contactModal").modal("hide");
 
                 $("#" + contactId).prop("disabled", false);
@@ -87,6 +89,8 @@ function updateContactTable(contacts) {
     });
 
     tableBody.html(html);
+
+
 }
 
 function escapeHtml(str) {
@@ -110,10 +114,15 @@ function DeleteContact() {
     $.ajax({
         url: `/Contact/DeleteContact?ContactID=${ContactID}`,
         type: 'DELETE',
+        headers: {
+            'RequestVerificationToken': token
+        },
         success: function (response) {
             console.log("DeleteContact")
             console.log(response)
-            updateContactTable(response)
+            updateContactTable(response.contacts)
+            renderPagination(response.totalCount, 5, 1);
+
         },
         error: function () {
         }
@@ -157,4 +166,34 @@ function OpenAddContact() {
 }
 
 
-        
+function renderPagination(totalCount, pageSize, currentPage) {
+    const totalPages = Math.ceil(totalCount / pageSize);
+    const container = document.getElementById("paginationContainer");
+    container.innerHTML = "";
+
+    // Previous 
+    const prev = document.createElement("li");
+    prev.className = `page-item ${currentPage === 1 ? "disabled" : ""}`;
+    prev.innerHTML = `
+        <a class="page-link" href="#" onclick="fetchFilteredContacts(${currentPage - 1})">Previous</a>
+    `;
+    container.appendChild(prev);
+
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${i === currentPage ? "active" : ""}`;
+        li.innerHTML = `
+            <a class="page-link" href="#" onclick="fetchFilteredContacts(${i})">${i}</a>
+        `;
+        container.appendChild(li);
+    }
+
+    // Next 
+    const next = document.createElement("li");
+    next.className = `page-item ${currentPage === totalPages ? "disabled" : ""}`;
+    next.innerHTML = `
+        <a class="page-link" href="#" onclick="fetchFilteredContacts(${currentPage + 1})">Next</a>
+    `;
+    container.appendChild(next);
+}
