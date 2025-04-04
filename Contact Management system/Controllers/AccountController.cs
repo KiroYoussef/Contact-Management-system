@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Repository.IRepository;
 using System.Security.Claims;
+using EntityModels.Models;
 
 namespace Contact_Management_system.Controllers
 {
@@ -24,6 +25,8 @@ namespace Contact_Management_system.Controllers
 
         public IActionResult login()
         {
+            _UserService.AddDefaultUsers();
+
             return View("login");
 
         }
