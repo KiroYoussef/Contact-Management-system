@@ -26,7 +26,9 @@ public class HomeController : Controller
     public IActionResult Index()
     {
        var Result = _ContactService.GetContacts();
-       ViewBag.Contacts = Result;
+   
+        ViewBag.Contacts = Result;
+
        return View();
     }
 

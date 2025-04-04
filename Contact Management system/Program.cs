@@ -9,7 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddControllersWithViews();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -29,6 +28,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSignalR(); // Add SignalR
 
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IContactService, ContactService>();
@@ -52,7 +52,13 @@ app.UseRouting();
 app.UseSession();
 
 app.UseAuthorization();
-
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<LockHub>("/lockHub"); // SignalR Hub
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

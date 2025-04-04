@@ -10,6 +10,6 @@ namespace Repository.IRepository
 {
     public interface IContactService
     {
-        List<Contact> GetContacts();
+       dynamic GetContacts();
     }
 }

@@ -3,6 +3,7 @@ using EntityModels.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Repository.IRepository;
 
 namespace Contact_Management_system.Controllers
 {
@@ -11,11 +12,14 @@ namespace Contact_Management_system.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         protected readonly AppDbContext _context;
+        private readonly IContactService _ContactService;
 
-        public ContactController(ILogger<HomeController> logger, AppDbContext context )
+        public ContactController(ILogger<HomeController> logger, AppDbContext context, IContactService contactService)
         {
             _logger = logger;
             _context = context;
+            _ContactService = contactService;
+
 
         }
 
@@ -37,11 +41,13 @@ namespace Contact_Management_system.Controllers
 
                 _context.Contacts.Add(CurrentContact);
                 _context.SaveChanges();
-                TempData["SuccessMessage"] = "Contact added successfully!";
-                return RedirectToAction("Index", "Home");
+
+     
             }
-            TempData["ErrorMessage"] = "Failed to add contact.";
-            return RedirectToAction("Index", "Home");
+            var Result = _ContactService.GetContacts();
+
+
+            return Json(Result);
         }
 
         [HttpPost]
@@ -61,12 +67,12 @@ namespace Contact_Management_system.Controllers
 
                     _context.Contacts.Update(contact);
                     _context.SaveChanges();
-                    TempData["SuccessMessage"] = "Contact updated successfully!";
-                    return RedirectToAction("Index", "Home");
                 }
             }
-            TempData["ErrorMessage"] = "Failed to update contact.";
-            return RedirectToAction("Index", "Home");
+            var Result = _ContactService.GetContacts();
+
+
+            return Json(Result);
         }
 
         [HttpGet]
@@ -88,10 +94,43 @@ namespace Contact_Management_system.Controllers
             {
                 _context.Contacts.Remove(contact);
                 _context.SaveChanges();
-                return Json(new { success = true });
             }
-            return Json(new { success = false, message = "Contact not found." });
+            var Result = _ContactService.GetContacts();
+
+
+            return Json(Result);
         }
+        [HttpGet]
+        public IActionResult SearchContacts(string name, string phone, string address)
+        {
+           var Result = _context.Contacts
+                .Include(c => c.User)
+                .Where(c =>
+                    (string.IsNullOrEmpty(name) || c.Name.Contains(name)) &&
+                    (string.IsNullOrEmpty(phone) || c.Phone.Contains(phone)) &&
+                    (string.IsNullOrEmpty(address) || c.Address.Contains(address)))
+                .Include(c => c.User)
+                    .Select(c => new {
+                        c.Id,
+                        c.Name,
+                        c.Email,
+                        c.Phone,
+                        c.CountryCode,
+                        c.Address,
+                        c.Notes,
+                        User = new
+                        {
+                            c.User.Id,
+                            c.User.Username
+                        }
+                    })
+                    .ToList();
+                    
+
+            return Json(Result);
+
+        }
+
     }
 }
 

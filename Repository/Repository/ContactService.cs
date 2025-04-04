@@ -22,24 +22,30 @@ namespace Repository.Repository
             _secretKey = configuration["SecretKey"];
         }
 
-        public List<Contact> GetContacts()
+        public dynamic GetContacts()
         {
             var contactUsers = _context.Contacts
-                                .Join(_context.Users,
-                                    contact => contact.InsertedUser,
-                                    user => user.Id,
-                                    (contact, user) => new Contact
-                                    {
-                                        Id = contact.Id,
-                                        Name = contact.Name,
-                                        Phone = contact.Phone,
-                                        InsertedUser = user.Id,
-                                        CountryCode = contact.CountryCode,
-                                        Address = contact.Address,
-                                        Notes = contact.Notes,
-                                        Email = contact.Email,
-                                        User = user
-                                    }).ToList();
+                               .Join(_context.Users,
+                                   contact => contact.InsertedUser,
+                                   user => user.Id,
+                                   (contact, user) => new {
+                                       contact.Id,
+                                       contact.Name,
+                                       contact.Phone,
+                                       contact.InsertedUser,
+                                       contact.CountryCode,
+                                       contact.Address,
+                                       contact.Notes,
+                                       contact.Email,
+                                       User = new
+                                       {
+                                           user.Id,
+                                           user.Username
+                                       }
+                                   })
+                               .ToList();
+
+
             return contactUsers;
         }
     }
