@@ -37,7 +37,9 @@ namespace Contact_Management_system.Controllers
             {
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.Username)
+                    new Claim(ClaimTypes.Name, user.Username),
+                   new Claim(ClaimTypes.NameIdentifier, Result.Result.Id.ToString())  // Store user ID as the NameIdentifier
+
                 };
 
                 // set user Data in session 

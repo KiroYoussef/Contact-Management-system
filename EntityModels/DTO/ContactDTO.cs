@@ -28,7 +28,7 @@ namespace EntityModels.DTO
         [Required]
         [MaxLength(250, ErrorMessage = "Address cannot exceed 250 characters")]
         public string Address { get; set; }
-
+        [Required]
         public string Notes { get; set; }
 
         [MaxLength(100, ErrorMessage = "Email cannot exceed 100 characters")]

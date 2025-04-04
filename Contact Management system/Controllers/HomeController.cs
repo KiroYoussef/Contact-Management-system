@@ -5,6 +5,8 @@ using EntityModels.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Repository.IRepository;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Contact_Management_system.Controllers;
 
@@ -24,7 +26,12 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-       var Result = _ContactService.GetContacts(null, null  , null,1,5);
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        HttpContext.Session.SetString("UserName", User.Identity.Name);
+        HttpContext.Session.SetString("UserId", User.Claims.LastOrDefault().Value);
+
+
+        var Result = _ContactService.GetContacts(null, null  , null,1,5);
    
         ViewBag.Contacts = Result;
 
